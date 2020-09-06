@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lz.crm.mapper.NoticeMapper" >
+  <resultMap id="BaseResultMap" type="com.lz.crm.domain.Notice" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="issuerId" property="issuer.id" jdbcType="BIGINT" />
+    <result column="issuerName" property="issuer.name"/>
+    <result column="pubdate" property="pubdate" jdbcType="TIMESTAMP" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="re" property="read"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from notice
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+    <insert id="insert" parameterType="com.lz.crm.domain.Notice" useGeneratedKeys="true" keyProperty="id" >
+    insert into notice (issuer_id, pubdate, title, 
+      content)
+    values (#{issuer.id,jdbcType=BIGINT}, #{pubdate,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR},
+      #{content,jdbcType=VARCHAR})
+  </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.lz.crm.domain.Notice" >
+    update notice
+    set pubdate= #{pubdate,jdbcType=TIMESTAMP}
+      title = #{title,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select id, issuer_id, pubdate, title, content,(select e.name from employee e where e.id=issuer_id) as issuerName
+    from notice
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select id, issuer_id, pubdate, title, content
+    from notice
+  </select>
+  <select id="selectForList" resultMap="BaseResultMap">
+
+select distinct
+ n.id ,
+ n.title,
+ (select name FROM employee emp where n.issuer_id=emp.id) as issuerName,
+ n.pubdate ,
+ n.content,
+ (select COUNT(DISTINCT notice_id,employee_id) FROM notice_employee WHERE notice_id=n.id and employee_id=e.id) as re,
+ e.name
+ FROM notice n
+ JOIN employee e
+ where e.id=#{currentUserId}
+  </select>
+    <select id="getRead" resultType="java.lang.Integer">
+      select COUNT(DISTINCT notice_id,employee_id) FROM notice_employee WHERE notice_id=#{noticeId} and employee_id=#{empId}
+    </select>
+    <insert id="saveRead">
+       insert into notice_employee (notice_id, employee_id)
+    values (#{noticeId}, #{empId})
+  </insert>
+    <delete id="deleteRead">
+        delete from notice_employee where notice_id=#{id}
+    </delete>
+</mapper>

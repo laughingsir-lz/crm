@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lz.crm.mapper.EmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.lz.crm.domain.Employee">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="admin" property="admin" jdbcType="BIT"/>
+        <!--  <result column="d_id" property="dept.id" jdbcType="BIGINT" />
+          <result column="d_name" property="dept.name" jdbcType="VARCHAR" />-->
+        <association property="dept" javaType="com.lz.crm.domain.Department" columnPrefix="d_">
+            <id column="id" property="id" jdbcType="BIGINT"/>
+            <result column="name" property="name" jdbcType="VARCHAR"/>
+        </association>
+        <!--利用额外sql封装角色集合 select需要执行的sql column代表sql中需要使用的参数 -->
+        <collection property="roles" select="com.lz.crm.mapper.RoleMapper.selectByEmpId" column="id"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from employee
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteRelation">
+        delete from employee_role where employee_id = #{id}
+    </delete>
+    <delete id="deleteBatch">
+        delete from employee where id in
+        <foreach collection="array" open="(" close=")" separator="," item="ele">
+            #{ele}
+        </foreach>
+    </delete>
+
+    <insert id="insert" parameterType="com.lz.crm.domain.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert into employee (name, password, email,
+        age, admin, dept_id)
+        values (#{name,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{age,jdbcType=INTEGER}, #{admin,jdbcType=BIT}, #{dept.id,jdbcType=BIGINT})
+    </insert>
+
+    <insert id="insertRelation">
+        insert into employee_role (employee_id, role_id) values (#{eid},#{rid})
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.lz.crm.domain.Employee">
+        update employee
+        set name = #{name,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        age = #{age,jdbcType=INTEGER},
+        admin = #{admin,jdbcType=BIT},
+        dept_id = #{dept.id,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select id, name, password, email, age, admin, dept_id as d_id
+        from employee
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, name, password, email, age, admin, dept_id
+        from employee
+    </select>
+    <select id="selectByUsernameAndPassword" resultType="com.lz.crm.domain.Employee">
+        select id, name, password, email, age, admin, dept_id
+        from employee
+        where name = #{username} and password = #{password}
+    </select>
+
+    <select id="selectForList" resultMap="BaseResultMap">
+        select e.id, e.name, e.password, e.email, e.age, e.admin,d.id as d_id,d.name as d_name from employee e
+        left join department d on e.dept_id = d.id
+        <where>
+            <if test="keyword!=null">
+                and (e.name like concat('%',#{keyword},'%') or e.email like concat('%',#{keyword},'%'))
+            </if>
+            <if test="deptId > -1">
+                and e.dept_id = #{deptId}
+            </if>
+        </where>
+    </select>
+    <select id="selectByName" resultType="com.lz.crm.domain.Employee">
+        select id, name, password, email, age, admin, dept_id
+        from employee
+        where name = #{name}
+    </select>
+    <select id="selectByRoleSn" resultType="com.lz.crm.domain.Employee">
+        select DISTINCT e.id,e.name from employee e
+        join employee_role er on e.id = er.employee_id
+        join role r on er.role_id = r.id
+        where r.sn in
+        <foreach collection="array" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+
+
+</mapper>

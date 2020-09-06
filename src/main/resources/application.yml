@@ -1,0 +1,29 @@
+# 分页插件合理化
+pagehelper:
+  reasonable: true
+# 连接池配置 四要素
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///crm?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+  freemarker:
+    suffix: .ftl
+
+  mvc:
+    pathmatch:
+      use-suffix-pattern: true
+
+# 实体类别名
+mybatis:
+  type-aliases-package: com.lz.crm.domain
+
+# 日志管理  sql日志
+logging:
+  level:
+    com:
+      lz:
+        crm:
+          mapper: trace
+    root: info

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.crm.mapper.CustomerReportMapper">
+    <select id="selectCustomerReport" resultType="map">
+        select ${groupType} groupType,count(c.id) number from customer c
+        left join employee e on c.seller_id = e.id
+        <where>
+            c.status = 0
+            <if test="keyword!=null">
+                and e.name like concat('%',#{keyword},'%')
+            </if>
+            <if test="beginDate!=null">
+                and c.input_time >= #{beginDate}
+            </if>
+            <if test="endDate!=null">
+                and c.input_time &lt;= #{endDate}
+            </if>
+        </where>
+        GROUP BY ${groupType}
+    </select>
+</mapper>

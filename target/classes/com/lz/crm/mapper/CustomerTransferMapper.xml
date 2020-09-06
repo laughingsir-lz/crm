@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.crm.mapper.CustomerTransferMapper">
+    <resultMap id="BaseResultMap" type="com.lz.crm.domain.CustomerTransfer">
+        <id column="id" property="id"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="reason" property="reason"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        delete from customertransfer
+        where id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into customertransfer (customer_id, operator_id, operate_time, oldSeller_id, newSeller_id,
+        reason)
+        values (#{customer.id}, #{operator.id}, #{operateTime}, #{oldseller.id}, #{newseller.id},
+        #{reason})
+    </insert>
+    <update id="updateByPrimaryKey">
+        update customertransfer
+        set customer_id = #{customer.id},
+        operator_id = #{operator.id},
+        operate_time = #{operateTime},
+        oldSeller_id = #{oldseller.id},
+        newSeller_id = #{newseller.id},
+        reason = #{reason}
+        where id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select id, customer_id, operator_id, operate_time, oldSeller_id, newSeller_id, reason
+        from customertransfer
+        where id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, customer_id, operator_id, operate_time, oldSeller_id, newSeller_id, reason
+        from customertransfer
+    </select>
+    <select id="selectForList" resultType="com.lz.crm.domain.CustomerTransfer">
+        select id, customer_id, operator_id, operate_time, oldSeller_id, newSeller_id, reason
+        from customertransfer
+    </select>
+</mapper>

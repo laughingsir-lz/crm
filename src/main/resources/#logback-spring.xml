@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    scan:开启日志框架的热部署,默认值true表示开启
+    scanPeriod:热部署的频率,默认值60 second
+    debug:设置输出框架内部的日志,默认值false
+-->
+<configuration scan="true" scanPeriod="60 second" debug="false">
+    <property name="appName" value="springboot demo" />
+    <contextName>${appName}</contextName>
+
+    <!-- appender:日志输出对象,配置不同的类拥有不同的功能
+        ch.qos.logback.core.ConsoleAppender:日志输出到控制台
+    -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd-HH:mm:ss} %level [%thread]-%logger{35} >> %msg %n</pattern>
+            　　　　　</encoder>
+        　　 </appender>
+
+    <!-- ch.qos.logback.core.FileAppender:日志输出到文件中
+    <appender name="fileAppender" class="ch.qos.logback.core.FileAppender">
+        <encoder>
+            <pattern>%-4relative [%thread] %level %logger{35} - %msg %n</pattern>
+    　　 </encoder>
+        <append>true</append>
+        <file>mylog.log</file>
+　　 </appender>
+    -->
+
+    <!-- root是项目通用的logger,一般情况下都是使用root配置的日志输出
+        level:按照级别输出日志,日志级别,级别越高,输出的内容越少
+            trace < debug < info < warn < error
+    -->
+    　　 <root level="info">
+    <appender-ref ref="STDOUT" />
+</root>
+
+    <!-- 自定义的logger,用于专门输出特定包中打印的日志
+    <logger name="cn.wolfcode.crm.mapper" level="trace">
+    </logger>
+	-->
+</configuration>

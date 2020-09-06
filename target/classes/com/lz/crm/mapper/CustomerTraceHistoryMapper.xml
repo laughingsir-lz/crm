@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.crm.mapper.CustomerTraceHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.lz.crm.domain.CustomerTraceHistory">
+        <id column="id" property="id"/>
+        <result column="trace_time" property="traceTime"/>
+        <result column="trace_details" property="traceDetails"/>
+        <result column="trace_result" property="traceResult"/>
+        <result column="remark" property="remark"/>
+        <result column="input_time" property="inputTime"/>
+        <result column="type" property="type"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+        delete from customertracehistory
+        where id = #{id}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into customertracehistory (trace_time, trace_details, trace_type_id, trace_result, remark,
+        customer_id, input_user_id, input_time, type)
+        values (#{traceTime}, #{traceDetails}, #{traceType.id}, #{traceResult}, #{remark},
+        #{customer.id}, #{inputUser.id}, #{inputTime}, #{type})
+    </insert>
+    <update id="updateByPrimaryKey">
+        update customertracehistory
+        set trace_time = #{traceTime},
+        trace_details = #{traceDetails},
+        trace_type_id = #{traceType.id},
+        trace_result = #{traceResult},
+        remark = #{remark},
+        customer_id = #{customer.id},
+        input_user_id = #{inputUser.id},
+        input_time = #{inputTime},
+        type = #{type}
+        where id = #{id}
+    </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select id, trace_time, trace_details, trace_type_id, trace_result, remark, customer_id,
+        input_user_id, input_time, type
+        from customertracehistory
+        where id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, trace_time, trace_details, trace_type_id, trace_result, remark, customer_id,
+        input_user_id, input_time, type
+        from customertracehistory
+    </select>
+    <select id="selectForList" resultType="com.lz.crm.domain.CustomerTraceHistory">
+        select id, trace_time, trace_details, trace_type_id, trace_result, remark, customer_id,
+        input_user_id, input_time, type
+        from customertracehistory
+    </select>
+</mapper>

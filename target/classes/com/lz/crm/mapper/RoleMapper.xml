@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.crm.mapper.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.lz.crm.domain.Role">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="sn" jdbcType="VARCHAR" property="sn"/>
+        <collection property="permissions" select="com.lz.crm.mapper.PermissionMapper.selectByRoleId" column="id"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from role
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <delete id="deleteRelation">
+        delete from role_permission where role_id = #{id}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.lz.crm.domain.Role"
+            useGeneratedKeys="true">
+        insert into role (name, sn)
+        values (#{name,jdbcType=VARCHAR}, #{sn,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertRelation">
+        insert into role_permission (role_id, permission_id) VALUES (#{rid},#{pid})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.lz.crm.domain.Role">
+        update role
+        set name = #{name,jdbcType=VARCHAR},
+        sn = #{sn,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select id, name, sn
+        from role
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, name, sn
+        from role
+    </select>
+    <select id="selectForList" resultType="com.lz.crm.domain.Role">
+        select id, name, sn from role
+    </select>
+    <select id="selectByEmpId" resultMap="BaseResultMap">
+        select r.id,r.name from role r join employee_role er on r.id = er.role_id
+        where er.employee_id = #{id}
+    </select>
+    <select id="selectSnByEmpId" resultType="String">
+        select r.sn from role r join employee_role er on r.id = er.role_id
+        where er.employee_id = #{id}
+    </select>
+</mapper>

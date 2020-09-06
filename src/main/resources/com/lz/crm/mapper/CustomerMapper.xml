@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lz.crm.mapper.CustomerMapper">
+    <resultMap id="BaseResultMap" type="com.lz.crm.domain.Customer">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="age" jdbcType="INTEGER" property="age"/>
+        <result column="gender" jdbcType="INTEGER" property="gender"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
+        <result column="input_time" jdbcType="TIMESTAMP" property="inputTime"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <association property="job" javaType="systemdictionaryitem" columnPrefix="j_">
+            <id column="id" property="id"/>
+            <result column="title" property="title"/>
+        </association>
+        <association property="source" javaType="SystemDictionaryItem" columnPrefix="s_">
+            <id column="id" property="id"/>
+            <result column="title" property="title"/>
+        </association>
+        <association property="seller" javaType="Employee" columnPrefix="e_">
+            <id column="id" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from customer
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.lz.crm.domain.Customer"
+            useGeneratedKeys="true">
+        insert into customer (name, age, gender,
+        tel, qq, job_id, source_id,
+        seller_id, inputUser_id, input_time,
+        status)
+        values (#{name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{gender,jdbcType=INTEGER},
+        #{tel,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR}, #{job.id,jdbcType=BIGINT}, #{source.id,jdbcType=BIGINT},
+        #{seller.id,jdbcType=BIGINT}, #{inputuser.id,jdbcType=BIGINT}, #{inputTime,jdbcType=TIMESTAMP},
+        #{status,jdbcType=INTEGER})
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.lz.crm.domain.Customer">
+        update customer
+        set name = #{name,jdbcType=VARCHAR},
+        age = #{age,jdbcType=INTEGER},
+        gender = #{gender,jdbcType=INTEGER},
+        tel = #{tel,jdbcType=VARCHAR},
+        qq = #{qq,jdbcType=VARCHAR},
+        job_id = #{job.id,jdbcType=BIGINT},
+        source_id = #{source.id,jdbcType=BIGINT}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateSeller">
+        update customer set seller_id = #{sellerId} where id = #{customerId}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select id, name, age, gender, tel, qq, job_id, source_id, seller_id, inputUser_id,
+        input_time, status
+        from customer
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select id, name, age, gender, tel, qq, job_id, source_id, seller_id, inputUser_id,
+        input_time, status
+        from customer
+    </select>
+    <select id="selectForList" resultMap="BaseResultMap">
+        SELECT
+        c.id,
+        c.NAME,
+        c.age,
+        c.gender,
+        c.tel,
+        c.qq,
+        c.input_time,
+        c.status , j.id j_id,j.title j_title,s.id s_id,s.title s_title,e.id e_id ,e.name e_name
+        FROM
+        customer c
+        left join systemdictionaryitem j on c.job_id = j.id
+        left join systemdictionaryitem s on c.source_id = s.id
+        left join employee e on c.seller_id = e.id
+        <where>
+            <if test="status > -1">
+                and c.status = #{status}
+            </if>
+            <if test="sellerId > -1">
+                and c.seller_id = #{sellerId}
+            </if>
+            <if test="keyword!=null">
+                and (c.name like concat('%',#{keyword},'%') or c.tel like concat('%',#{keyword},'%') )
+            </if>
+        </where>
+    </select>
+</mapper>
